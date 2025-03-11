@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sliding Puzzle Game</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f8f9fa;
+        }
+        .puzzle-container {
+            display: grid;
+            gap: 5px;
+        }
+        .tile {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: white;
+        }
+        .empty {
+            background-color: transparent;
+            cursor: default;
+        }
+        #message {
+            margin-top: 20px;
+            font-size: 1.2em;
+            font-weight: bold;
+            color: green;
+            display: none;
+        }
+        @media (max-width: 600px) {
+            .puzzle-container {
+                grid-template-columns: repeat(3, 80px);
+                grid-template-rows: repeat(3, 80px);
+            }
+            .tile {
+                width: 80px;
+                height: 80px;
+            }
+        }
+        @media (min-width: 601px) {
+            .puzzle-container {
+                grid-template-columns: repeat(3, 100px);
+                grid-template-rows: repeat(3, 100px);
+            }
+            .tile {
+                width: 100px;
+                height: 100px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h2>Sliding Puzzle Game</h2>
+    <div class="puzzle-container" id="puzzle"></div>
+    <button onclick="shuffleTiles()">Shuffle</button>
+    <p id="message">You solved the puzzle!</p>
+    <script>
+        let puzzleContainer = document.getElementById("puzzle");
+        let message = document.getElementById("message");
+        let tiles = [];
+
+        function initPuzzle() {
+            tiles = [...Array(8).keys()].map(i => i + 1);
+            tiles.push(null); // Empty space
+            renderTiles();
+        }
+
+        function renderTiles() {
+            puzzleContainer.innerHTML = "";
+            tiles.forEach((num, index) => {
+                let tile = document.createElement("div");
+                tile.classList.add("tile");
+                if (num === null) {
+                    tile.classList.add("empty");
+                } else {
+                    tile.textContent = num;
+                    tile.onclick = () => moveTile(index);
+                }
+                puzzleContainer.appendChild(tile);
+            });
+            checkWin();
+        }
+
+        function moveTile(index) {
+            let emptyIndex = tiles.indexOf(null);
+            let validMoves = [index - 1, index + 1, index - 3, index + 3];
+            if (validMoves.includes(emptyIndex)) {
+                [tiles[index], tiles[emptyIndex]] = [tiles[emptyIndex], tiles[index]];
+                renderTiles();
+            }
+        }
+
+        function shuffleTiles() {
+            for (let i = tiles.length - 1; i > 0; i--) {
+                let j = Math.floor(Math.random() * (i + 1));
+                [tiles[i], tiles[j]] = [tiles[j], tiles[i]];
+            }
+            message.style.display = "none";
+            renderTiles();
+        }
+
+        function checkWin() {
+            if (tiles.slice(0, 8).every((num, index) => num === index + 1)) {
+                message.style.display = "block";
+            }
+        }
+
+        initPuzzle();
+    </script>
+</body>
+</html>
